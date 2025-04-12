@@ -1,0 +1,23 @@
+version: '3'
+services:
+  mysql-docker:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: 'insight'
+      MYSQL_ROOT_PASSWORD: '1234'
+      TZ: Asia/Seoul
+    container_name: 'insight-mysql'
+#    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - '3306:3306'
+    volumes:
+      - /Users/eunbin/insight/docker/data/mysql:/var/lib/mysql
+
+  redis-docker:
+    image: redis:latest
+    container_name: 'insight-redis'
+    command: redis-server --port 6379
+    ports:
+      - '6379:6379'
+    volumes:
+      - /Users/eunbin/insight/docker/data/redis:/data
