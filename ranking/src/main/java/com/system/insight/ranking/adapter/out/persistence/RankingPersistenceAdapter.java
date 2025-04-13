@@ -7,34 +7,38 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class RankingPersistenceAdapter implements RankingPersistencePort {
-    private final RankingRepository rankingRepository;
+    private final JpaRankingRepository jpaRepository;
     private final RankingMapper rankingMapper;
-
+    
     @Override
     public Ranking save(Ranking ranking) {
         RankingJpaEntity entity = rankingMapper.toJpaEntity(ranking);
-        RankingJpaEntity savedEntity = rankingRepository.save(entity);
+        RankingJpaEntity savedEntity = jpaRepository.save(entity);
         return rankingMapper.toDomain(savedEntity);
     }
-
+    
+    @Override
+    public Optional<Ranking> findByUserId(String userId) {
+        return jpaRepository.findTopByUserIdOrderBySnapshotTimeDesc(userId)
+            .map(rankingMapper::toDomain);
+    }
+    
     @Override
     public List<Ranking> findTopRankings(int limit, LocalDateTime snapshotTime) {
-        return rankingRepository.findTopRankings(snapshotTime)
-                .stream()
-                .limit(limit)
-                .map(rankingMapper::toDomain)
-                .toList();
+        return jpaRepository.findTopRankings(limit, snapshotTime).stream()
+            .map(rankingMapper::toDomain)
+            .toList();
     }
-
+    
     @Override
     public List<Ranking> findUserRankings(String userId, LocalDateTime startTime, LocalDateTime endTime) {
-        return rankingRepository.findUserRankings(userId, startTime, endTime)
-                .stream()
-                .map(rankingMapper::toDomain)
-                .toList();
+        return jpaRepository.findUserRankings(userId, startTime, endTime).stream()
+            .map(rankingMapper::toDomain)
+            .toList();
     }
-} 
+}
