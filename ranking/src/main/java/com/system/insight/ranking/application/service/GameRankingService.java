@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,7 @@ public class GameRankingService implements GameRankingUseCase {
     private final RedisTemplate<String, String> redisTemplate;
     private final RankingPersistencePort rankingPersistencePort;
     private static final String RANKING_KEY = "game:ranking";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     
     @Override
     @CacheEvict(cacheNames = "ranking", allEntries = true)
@@ -36,8 +39,9 @@ public class GameRankingService implements GameRankingUseCase {
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
         zSetOps.add(RANKING_KEY, request.userId(), request.score());
         
-        // 현재 순위 조회
-        Long rank = zSetOps.reverseRank(RANKING_KEY, request.userId());
+        // 현재 순위 조회 (0-based index를 1-based rank로 변환)
+        Long zeroBasedRank = zSetOps.reverseRank(RANKING_KEY, request.userId());
+        int rank = (zeroBasedRank != null) ? zeroBasedRank.intValue() + 1 : 1;
         
         // MySQL에 저장
         Ranking newRanking = Ranking.create(
@@ -45,7 +49,7 @@ public class GameRankingService implements GameRankingUseCase {
             request.nickname(),
             request.profileImageUrl(),
             request.score(),
-            rank != null ? rank.intValue() + 1 : 0,
+            rank,
             now
         );
         rankingPersistencePort.save(newRanking);
@@ -55,37 +59,36 @@ public class GameRankingService implements GameRankingUseCase {
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = "ranking", key = "'top10'")
     public List<GameRankingResponse> getTop10Rankings() {
-        // Redis에서 상위 10명 조회
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
         Set<ZSetOperations.TypedTuple<String>> rangeWithScores = 
             zSetOps.reverseRangeWithScores(RANKING_KEY, 0, 9);
             
         if (rangeWithScores == null || rangeWithScores.isEmpty()) {
-            // Redis에 데이터가 없으면 MySQL에서 조회
             return rankingPersistencePort.findTopRankings(10, LocalDateTime.now()).stream()
-                .map(ranking -> new GameRankingResponse(
+                .map(ranking -> GameRankingResponse.from(
                     ranking.getRanking(),
                     ranking.getNickname(),
                     ranking.getProfileImageUrl(),
                     ranking.getScore(),
-                    ranking.getSnapshotTime()
+                    ranking.getSnapshotTime().format(DATE_FORMATTER)
                 ))
                 .collect(Collectors.toList());
         }
         
-        // Redis 데이터 반환
         return rangeWithScores.stream()
             .map(tuple -> {
                 String userId = tuple.getValue();
                 Ranking ranking = rankingPersistencePort.findByUserId(userId)
                     .orElseThrow(() -> new IllegalStateException("Ranking not found for user: " + userId));
-                    
-                return new GameRankingResponse(
-                    Math.toIntExact(zSetOps.reverseRank(RANKING_KEY, userId) + 1),
+                
+                Long rankScore = zSetOps.reverseRank(RANKING_KEY, userId);
+                
+                return GameRankingResponse.from(
+                    Math.toIntExact(rankScore + 1),
                     ranking.getNickname(),
                     ranking.getProfileImageUrl(),
-                    tuple.getScore().longValue(),
-                    ranking.getSnapshotTime()
+                    Objects.requireNonNull(tuple.getScore()).longValue(),
+                    ranking.getSnapshotTime().format(DATE_FORMATTER)
                 );
             })
             .collect(Collectors.toList());

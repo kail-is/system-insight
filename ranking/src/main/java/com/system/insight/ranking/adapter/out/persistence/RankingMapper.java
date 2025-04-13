@@ -1,30 +1,30 @@
 package com.system.insight.ranking.adapter.out.persistence;
 
 import com.system.insight.ranking.domain.model.Ranking;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
 
-@Component
-public class RankingMapper {
+@Mapper(componentModel = "spring")
+public interface RankingMapper {
     
-    public Ranking toDomain(RankingJpaEntity entity) {
-        return Ranking.create(
-                entity.getUserId(),
-                entity.getNickname(),
-                entity.getProfileImageUrl(),
-                (long) entity.getScore(),
-                entity.getRanking(),
-                entity.getSnapshotTime()
+    default RankingJpaEntity toJpaEntity(Ranking ranking) {
+        return new RankingJpaEntity(
+            ranking.getUserId(),
+            ranking.getNickname(),
+            ranking.getProfileImageUrl(),
+            ranking.getScore().intValue(),
+            ranking.getRanking(),
+            ranking.getSnapshotTime()
         );
     }
     
-    public RankingJpaEntity toJpaEntity(Ranking domain) {
-        return new RankingJpaEntity(
-                domain.getUserId(),
-                domain.getNickname(),
-                domain.getProfileImageUrl(),
-                domain.getScore().intValue(),
-                domain.getRanking(),
-                domain.getSnapshotTime()
+    default Ranking toDomain(RankingJpaEntity entity) {
+        return Ranking.create(
+            entity.getUserId(),
+            entity.getNickname(),
+            entity.getProfileImageUrl(),
+            (long) entity.getScore(),
+            entity.getRanking(),
+            entity.getSnapshotTime()
         );
     }
 } 
