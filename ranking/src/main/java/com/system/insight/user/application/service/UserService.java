@@ -14,21 +14,11 @@ public class UserService implements UserUseCase {
     private final UserPersistencePort userPersistencePort;
 
     @Override
-    public User createUser(String userId, String nickname) {
+    public User createUser(String userId, String nickname, String profileImageUrl) {
         if (userPersistencePort.existsByUserId(userId)) {
             throw new IllegalArgumentException("User already exists with userId: " + userId);
         }
-        User user = User.create(userId, nickname);
-        return userPersistencePort.save(user);
-    }
-
-    @Override
-    public User updateUserNickname(String userId, String newNickname) {
-        User user = userPersistencePort.findByUserId(userId);
-        if (user == null) {
-            throw new IllegalArgumentException("User not found with userId: " + userId);
-        }
-        user.updateNickname(newNickname);
+        User user = User.create(userId, nickname, profileImageUrl);
         return userPersistencePort.save(user);
     }
 
@@ -40,5 +30,10 @@ public class UserService implements UserUseCase {
             throw new IllegalArgumentException("User not found with userId: " + userId);
         }
         return user;
+    }
+
+    @Override
+    public User findByUserId(String userId) {
+        return userPersistencePort.findByUserId(userId);
     }
 } 

@@ -22,21 +22,21 @@ public class UserJpaEntity {
     @Column(nullable = false)
     private String nickname;
 
+    @Column(nullable = false)
+    private String profileImageUrl;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public UserJpaEntity(String userId, String nickname) {
+    public UserJpaEntity(String userId, String nickname, String profileImageUrl) {
         this.userId = userId;
         this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-        this.updatedAt = LocalDateTime.now();
-    }
 } 

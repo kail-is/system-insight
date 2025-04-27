@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -14,8 +17,13 @@ public class GameRecordService implements GameRecordUseCase {
     private final GameRecordPersistencePort gameRecordPersistencePort;
 
     @Override
-    public GameRecord recordGame(String userId, String gameType, Long score, Integer playTime) {
-        GameRecord gameRecord = GameRecord.create(userId, gameType, score, playTime);
+    public GameRecord recordGame(String userId, Long score, LocalDateTime playAt) {
+        GameRecord gameRecord = GameRecord.create(userId, score, playAt);
         return gameRecordPersistencePort.save(gameRecord);
+    }
+
+    @Override
+    public List<GameRecord> findTop10ByOrderByScoreDesc() {
+        return gameRecordPersistencePort.findTop10ByOrderByScoreDesc();
     }
 } 

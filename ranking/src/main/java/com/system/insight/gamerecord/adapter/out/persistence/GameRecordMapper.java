@@ -8,18 +8,16 @@ public class GameRecordMapper {
     public GameRecordJpaEntity toEntity(GameRecord gameRecord) {
         return new GameRecordJpaEntity(
             gameRecord.getUserId(),
-            gameRecord.getGameType(),
             gameRecord.getScore(),
-            gameRecord.getPlayTime()
+            gameRecord.getPlayAt() 
         );
     }
 
     public GameRecord toDomain(GameRecordJpaEntity entity) {
         return GameRecord.create(
             entity.getUserId(),
-            entity.getGameType(),
             entity.getScore(),
-            entity.getPlayTime()
+            entity.getPlayAt()
         );
     }
 } 

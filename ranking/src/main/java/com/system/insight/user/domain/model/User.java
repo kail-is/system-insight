@@ -12,22 +12,20 @@ public class User {
     private Long id;
     private String userId;
     private String nickname;
+    private String profileImageUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private User(String userId, String nickname) {
+    private User(String userId, String nickname, String profileImageUrl) {
         this.userId = userId;
         this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public static User create(String userId, String nickname) {
-        return new User(userId, nickname);
+    public static User create(String userId, String nickname, String profileImageUrl) {
+        return new User(userId, nickname, profileImageUrl);
     }
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-        this.updatedAt = LocalDateTime.now();
-    }
-} 
+}

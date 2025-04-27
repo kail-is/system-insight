@@ -1,5 +1,7 @@
 package com.system.insight.gamerecord.adapter.out.persistence;
 
+import java.util.List;
+
 import com.system.insight.gamerecord.application.port.out.GameRecordPersistencePort;
 import com.system.insight.gamerecord.domain.model.GameRecord;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +18,13 @@ public class GameRecordPersistenceAdapter implements GameRecordPersistencePort {
         GameRecordJpaEntity entity = gameRecordMapper.toEntity(gameRecord);
         GameRecordJpaEntity savedEntity = gameRecordRepository.save(entity);
         return gameRecordMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    public List<GameRecord> findTop10ByOrderByScoreDesc() {
+        return gameRecordRepository.findTop10ByOrderByScoreDesc()
+            .stream()
+            .map(gameRecordMapper::toDomain)
+            .toList();
     }
 } 

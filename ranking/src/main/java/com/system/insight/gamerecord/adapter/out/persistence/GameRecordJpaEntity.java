@@ -19,23 +19,19 @@ public class GameRecordJpaEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "game_type", nullable = false)
-    private String gameType;
-
     @Column(nullable = false)
     private Long score;
 
-    @Column(name = "play_time", nullable = false)
-    private Integer playTime;
+    @Column(name = "play_at", nullable = false)
+    private LocalDateTime playAt;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public GameRecordJpaEntity(String userId, String gameType, Long score, Integer playTime) {
+    public GameRecordJpaEntity(String userId, Long score, LocalDateTime playAt) {
         this.userId = userId;
-        this.gameType = gameType;
         this.score = score;
-        this.playTime = playTime;
+        this.playAt = playAt;
         this.createdAt = LocalDateTime.now();
     }
 } 

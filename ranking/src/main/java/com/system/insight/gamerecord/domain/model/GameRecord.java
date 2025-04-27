@@ -11,20 +11,18 @@ import java.time.LocalDateTime;
 public class GameRecord {
     private Long id;
     private String userId;
-    private String gameType;
     private Long score;
-    private Integer playTime;
+    private LocalDateTime playAt;
     private LocalDateTime createdAt;
 
-    private GameRecord(String userId, String gameType, Long score, Integer playTime) {
+    private GameRecord(String userId, Long score, LocalDateTime playAt) {
         this.userId = userId;
-        this.gameType = gameType;
         this.score = score;
-        this.playTime = playTime;
+        this.playAt = playAt;
         this.createdAt = LocalDateTime.now();
     }
 
-    public static GameRecord create(String userId, String gameType, Long score, Integer playTime) {
-        return new GameRecord(userId, gameType, score, playTime);
+    public static GameRecord create(String userId, Long score, LocalDateTime playAt) {
+        return new GameRecord(userId, score, playAt);
     }
 } 
