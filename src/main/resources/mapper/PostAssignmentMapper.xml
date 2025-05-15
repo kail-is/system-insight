@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.PostAssignmentMapper">
+    <select id="selectByPostId" resultType="com.example.entity.PostAssignment">
+        SELECT * FROM post_assignment WHERE post_id = #{postId}
+    </select>
+
+    <update id="update">
+        UPDATE post_assignment
+        SET is_manager = #{isManager},
+            is_deleted = #{isDeleted}
+        WHERE post_id = #{postId} AND name = #{name}
+    </update>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post_assignment(post_id, sequence, name, is_manager, is_deleted)
+        VALUES(#{postId}, #{sequence}, #{name}, #{isManager}, #{isDeleted})
+    </insert>
+</mapper> 
