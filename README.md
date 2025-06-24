@@ -22,5 +22,4 @@
 * 2차 구현: RDB
   
 # 2차: 선착순 쿠폰 시스템
-* 아키텍처 설계
-* API 구현
+* [Coupon System](https://github.com/kail-is/system-insight/tree/main/coupon)
